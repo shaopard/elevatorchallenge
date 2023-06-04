@@ -1,5 +1,6 @@
 ﻿using DVT.ElevatorChallenge.Application;
 using DVT.ElevatorChallenge.Entities;
+using DVT.ElevatorChallenge.Enums;
 using DVT.ElevatorChallenge.Extensions;
 using DVT.ElevatorChallenge.Services.Abstract;
 
@@ -49,9 +50,26 @@ namespace DVT.ElevatorChallenge.Services.Concrete
                     }
                 }
 
+                elevatorToCome.Status = GetElevatorStatus(elevatorToCome, floorCallingElevator);
+
                 Console.WriteLine("The elevator coming is:");
                 Console.WriteLine($"{elevatorToCome.ShowStatus()}");
             }
+        }
+
+        private ElevatorStatus GetElevatorStatus(Elevator elevatorToCome, int floorCallingElevator)
+        {
+            var updatedElevatorStatus = elevatorToCome.Status;
+            updatedElevatorStatus = updatedElevatorStatus switch
+            {
+                ElevatorStatus.GoingDown when elevatorToCome.CurrentFloor < floorCallingElevator => ElevatorStatus
+                    .GoingUp,
+                ElevatorStatus.GoingUp when elevatorToCome.CurrentFloor > floorCallingElevator => ElevatorStatus
+                    .GoingDown,
+                _ => updatedElevatorStatus
+            };
+
+            return updatedElevatorStatus;
         }
     }
 }
